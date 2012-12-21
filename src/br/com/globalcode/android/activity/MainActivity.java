@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 	
 	private EditText editTextImagePath;
 	private ImageView imageView;
-	private String imagePath;
+	private String imageURL;
 	private ProgressDialog progressDialog;
 	
 	@Override
@@ -36,8 +36,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 
-				imagePath = editTextImagePath.getText().toString();
-				String[] paths = {imagePath};
+				imageURL = editTextImagePath.getText().toString();
+				String[] paths = {imageURL};
 				new AsyncLoadImage().execute(paths);
 			}
 		});
@@ -47,7 +47,6 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				imagePath = editTextImagePath.getText().toString();
 				loadImageByWorkThread();
 			}
 
@@ -57,25 +56,30 @@ public class MainActivity extends Activity {
 
 	protected void loadImageByWorkThread() {
 		
-		Log.d("And1OnlineLab12", "Work Thread Image Path is: " + imagePath);
+		imageURL = editTextImagePath.getText().toString();
+		
+		Log.d("And1OnlineLab12", "Work Thread Image Path is: " + imageURL);
 		
 		new Thread() {
 			
 			@Override
 			public void run() {
 				
+				final Drawable imageDrawable = Util4Android.loadImageFromNetwork(imageURL);
+				
 				imageView.post(new Runnable() {
 					
 					@Override
 					public void run() {
 						
-						Log.d("And1OnlineLab12", "Image Path is: " + imagePath);
-						final Drawable imageDrawable = Util4Android.loadImageFromNetwork(imagePath);
+						Log.d("And1OnlineLab12", "Image Path is: " + imageURL);
+						
 						imageView.setImageDrawable(imageDrawable);
+						editTextImagePath.setText("");
 					}
 				});
 			}
-		};
+		}.start();
 		
 	}
 	
@@ -98,6 +102,7 @@ public class MainActivity extends Activity {
 			
 			imageView.setImageDrawable(result);
 			progressDialog.dismiss();
+			editTextImagePath.setText("");
 		}
 
 	}
